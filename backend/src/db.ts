@@ -11,12 +11,25 @@ export async function initDB() {
 
   await db.exec(`
     CREATE TABLE IF NOT EXISTS journal_entries (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      mood INTEGER,
+      entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
       text TEXT,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      mood INTEGER
     );
   `);
+  
+  await db.exec(`
+    CREATE TABLE coping_suggestions (
+      suggestion_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      text TEXT NOT NULL,
+      related_journal_entries TEXT, -- JSON array: "[1,3,5,7]"
+      emotion_tag TEXT,
+      suggestion_type_tag TEXT
+);
+    
+  `)
+
 }
 
 export function getDB() {
