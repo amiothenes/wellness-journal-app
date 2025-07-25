@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getDB } from '../db';
-import { CreateSuggestionRequest } from '../models/Suggestions';
+import { CreateSuggestionRequest } from '../models/Suggestion';
 
 export const getAllEntries = async (req: Request, res: Response) => {
   try {
