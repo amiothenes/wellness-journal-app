@@ -1,3 +1,2 @@
-# Ignore the backend database file
 src/database.db
 docs

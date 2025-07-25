@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getDB } from '../db';
-import { JournalEntry, CreateJournalEntryRequest } from '../models/JournalEntry';
+import { CreateJournalEntryRequest } from '../models/JournalEntry';
 
 export const getAllEntries = async (req: Request, res: Response) => {
   try {

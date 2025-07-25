@@ -9,4 +9,7 @@ export interface Suggestion {
 export interface CreateSuggestionRequest {
     text: string;
     mood: number;
+    emotion_tag: string;
+    suggestion_type_tag: string;
+    related_journal_entries: string;
 }

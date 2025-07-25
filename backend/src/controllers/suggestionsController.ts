@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getDB } from '../db';
-import { Suggestion, CreateSuggestionRequest } from '../models/Suggestions';
+import { CreateSuggestionRequest } from '../models/Suggestions';
 
 export const getAllEntries = async (req: Request, res: Response) => {
   try {
@@ -14,17 +14,16 @@ export const getAllEntries = async (req: Request, res: Response) => {
 
 export const createEntry = async (req: Request<{}, {}, CreateSuggestionRequest>, res: Response) => {
   try {
-    const { mood, text } = req.body;
+    const {emotion_tag, suggestion_type_tag, related_journal_entries, text } = req.body;
     const db = getDB();
     
     const result = await db.run(
-      'INSERT INTO coping_suggestions (mood, text) VALUES (?, ?)',
-      [mood, text]
+      'INSERT INTO coping_suggestions (emotion_tag, suggestion_type_tag, related_journal_entries, text) VALUES (?, ?, ?, ?)',
+      [emotion_tag, suggestion_type_tag, related_journal_entries, text]
     );
     
     res.status(201).json({ 
       id: result.lastID,
-      mood,
       text,
       message: 'Entry created successfully' 
     });
