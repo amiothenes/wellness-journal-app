@@ -19,7 +19,7 @@ export async function initDB() {
   `);
   
   await db.exec(`
-    CREATE TABLE coping_suggestions (
+    CREATE TABLE IF NOT EXISTS coping_suggestions (
       suggestion_id INTEGER PRIMARY KEY AUTOINCREMENT,
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
       text TEXT NOT NULL,
