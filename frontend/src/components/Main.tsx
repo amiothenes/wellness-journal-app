@@ -1,10 +1,21 @@
-import React, {ChangeEvent, FormEvent} from 'react';
+import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import '../styles/Main.css';
+import {JournalEntry, MainProps} from '../types/Entry';
 
-function Main() {
-    const [currentMood, setCurrentMood] = React.useState<number>(5);
-    const [currentEntry, setCurrentEntry] = React.useState<string>();
-    const [savedEntry, setSavedEntry] = React.useState<string>();
+function Main({selectedEntry, onSave}: MainProps) {
+    const [currentMood, setCurrentMood] = useState<number>(5);
+    const [currentEntry, setCurrentEntry] = useState<string>("");
+    const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(selectedEntry);
+
+    useEffect(() => {
+        if (selectedEntry) {
+            // Update savedEntry when selectedEntry changes
+            setSavedEntry(selectedEntry);
+            // Also populate the form fields
+            setCurrentMood(selectedEntry.mood);
+            setCurrentEntry("");
+        }
+        }, [selectedEntry]);
 
     const handleMood = (event: ChangeEvent<HTMLInputElement>) => {
         setCurrentMood(parseInt(event.target.value));
@@ -16,13 +27,14 @@ function Main() {
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setSavedEntry(currentEntry);
+
+        onSave(currentMood, currentEntry);
         setCurrentEntry("");
     }
 
   return (
     <div>
-        <p>{savedEntry}</p>
+        <p>{savedEntry?.text}</p>
         <form onSubmit={handleSubmit}>
             <textarea rows={10}
                         placeholder="What's on your mind?"
