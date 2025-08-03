@@ -1,8 +1,8 @@
 import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import '../styles/Main.css';
-import {JournalEntry, MainProps} from '../types/Entry';
+import {ChatParagraph, JournalEntry, MainProps} from '../types/Entry';
 
-function Main({selectedEntry, onSave}: MainProps) {
+function Main({selectedEntry, onSave, onDelete}: MainProps) {
     const [currentMood, setCurrentMood] = useState<number>(5);
     const [currentEntry, setCurrentEntry] = useState<string>("");
     const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(selectedEntry);
@@ -11,11 +11,9 @@ function Main({selectedEntry, onSave}: MainProps) {
         if (selectedEntry) {
             // Update savedEntry when selectedEntry changes
             setSavedEntry(selectedEntry);
-            // Also populate the form fields
-            setCurrentMood(selectedEntry.mood);
             setCurrentEntry("");
         }
-        }, [selectedEntry]);
+    }, [selectedEntry]);
 
     const handleMood = (event: ChangeEvent<HTMLInputElement>) => {
         setCurrentMood(parseInt(event.target.value));
@@ -27,14 +25,25 @@ function Main({selectedEntry, onSave}: MainProps) {
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
         onSave(currentMood, currentEntry);
         setCurrentEntry("");
+        setCurrentMood(5);
     }
 
   return (
     <div>
-        <p>{savedEntry?.text}</p>
+        <div className="paragraphs-display">
+            {(savedEntry?.paragraphs || []).map((paragraph) => (
+                <div key={paragraph.paragraph_id} className="paragraph-item">
+                    <p>{paragraph.text}</p>
+                    <div className="paragraph-meta">
+                        <span>Mood: {paragraph.mood}/10</span>
+                        <span>{new Date(paragraph.timestamp).toLocaleString()}</span>
+                        <button className='paragraph-delete' onClick={() => onDelete(paragraph)}>Delete</button>
+                    </div>
+                </div>
+            ))}
+        </div>
         <form onSubmit={handleSubmit}>
             <textarea rows={10}
                         placeholder="What's on your mind?"
