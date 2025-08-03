@@ -1,8 +1,14 @@
 export interface JournalEntry {
-  id?: number;
-  mood: number;
+  id: number;
+  timestamp: Date;
+  paragraphs: ChatParagraph[];
+}
+
+export interface ChatParagraph {
+  id: number;
+  timestamp: Date;
   text: string;
-  timestamp?: Date;
+  mood: number;
 }
 
 export interface CreateJournalEntryRequest {

@@ -1,10 +1,19 @@
-import React, {ChangeEvent, FormEvent} from 'react';
+import React, {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import '../styles/Main.css';
+import {ChatParagraph, JournalEntry, MainProps} from '../types/Entry';
 
-function Main() {
-    const [currentMood, setCurrentMood] = React.useState<number>(5);
-    const [currentEntry, setCurrentEntry] = React.useState<string>('');
-    const [savedEntry, setSavedEntry] = React.useState<string[]>([]);
+function Main({selectedEntry, onSave, onDelete}: MainProps) {
+    const [currentMood, setCurrentMood] = useState<number>(5);
+    const [currentEntry, setCurrentEntry] = useState<string>("");
+    const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(selectedEntry);
+
+    useEffect(() => {
+        if (selectedEntry) {
+            // Update savedEntry when selectedEntry changes
+            setSavedEntry(selectedEntry);
+            setCurrentEntry("");
+        }
+    }, [selectedEntry]);
 
     const handleMood = (event: ChangeEvent<HTMLInputElement>) => {
         setCurrentMood(parseInt(event.target.value));
@@ -16,64 +25,45 @@ function Main() {
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setSavedEntry(prevEntries => [...prevEntries, currentEntry.trim()]);
+        onSave(currentMood, currentEntry);
         setCurrentEntry("");
+        setCurrentMood(5);
     }
-    
-    return (
-        <div className='main'>
-            <div className='main-background'></div>
-            <div className='entries-container'>
-                {savedEntry.map((entry, index) => (
-                    <div key={index} className='entry'>
-                        <p>{entry}</p>
-                        {index < savedEntry.length - 1}
+
+  return (
+    <div>
+        <div className="paragraphs-display">
+            {(savedEntry?.paragraphs || []).map((paragraph) => (
+                <div key={paragraph.paragraph_id} className="paragraph-item">
+                    <p>{paragraph.text}</p>
+                    <div className="paragraph-meta">
+                        <span>Mood: {paragraph.mood}/10</span>
+                        <span>{new Date(paragraph.timestamp).toLocaleString()}</span>
+                        <button className='paragraph-delete' onClick={() => onDelete(paragraph)}>Delete</button>
                     </div>
-                ))}
-            </div>
-            <form onSubmit={handleSubmit}>
-                <textarea 
-                    rows={10}
-                    placeholder="What's on your mind?"
-                    onChange={handleCurrentEntry}
-                    value={currentEntry}
-                />
-                
-                <div className="mood-selector-container">
-                    <span className="mood-label">Select Mood:</span>
-                    
-                    <div className='mood-slider'>
-                        <div className='slider-container'>
-                            <span className='slider-min-max'>1</span>
-                            <div className='slider-track-container'>
-                                <div className='slider-track'></div>
-                                <div className='slider-ticks'>
-                                    {[...Array(10)].map((_, i) => (
-                                        <div key={i} className='slider-tick'></div>
-                                    ))}
-                                </div>
-                                <input 
-                                    type="range"
-                                    className='slider-input'
-                                    min={1}
-                                    max={10}
-                                    step={1}
-                                    value={currentMood}
-                                    onChange={handleMood}
-                                />
-                            </div>
-                            <span className='slider-min-max'>10</span>
-                        </div>
-                        <div className='slider-value'>{currentMood}</div>
-                    </div>
-                    
-                    <button type="submit" className="save-button" aria-label="Save entry">
-                        <span className="visually-hidden">Save</span>
-                    </button>
                 </div>
-            </form>
+            ))}
         </div>
-    );
+        <form onSubmit={handleSubmit}>
+            <textarea rows={10}
+                        placeholder="What's on your mind?"
+                        onChange={handleCurrentEntry}
+                        value={currentEntry}>
+                        </textarea>
+            <div className="mood-selector">
+                <span>1</span><input type="range"
+                                        min={1}
+                                        max={10}
+                                        step={1}
+                                        value={currentMood}
+                                        onChange={handleMood}
+                ></input><span>10</span>
+                <p>{currentMood}</p>
+            </div>
+            <button>Save</button>
+        </form>
+    </div>
+  );
 }
 
 export default Main;

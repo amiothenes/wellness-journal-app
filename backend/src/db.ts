@@ -12,22 +12,32 @@ export async function initDB() {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS journal_entries (
       entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS chat_paragraphs (
+      paragraph_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      entry_id INTEGER NOT NULL, --journal_entry foreign key
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
       text TEXT,
-      mood INTEGER
+      mood INTEGER,
+      FOREIGN KEY (entry_id) REFERENCES journal_entries(entry_id) ON DELETE CASCADE
     );
   `);
   
   await db.exec(`
     CREATE TABLE IF NOT EXISTS coping_suggestions (
       suggestion_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      entry_id INTEGER NOT NULL, --journal_entry foreign key
+      related_paragraphs TEXT, -- JSON array: "[1,3,5,7]"
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
       text TEXT NOT NULL,
-      related_journal_entries TEXT, -- JSON array: "[1,3,5,7]"
       emotion_tag TEXT,
-      suggestion_type_tag TEXT
-);
-    
+      suggestion_type_tag TEXT,
+      FOREIGN KEY (entry_id) REFERENCES journal_entries(entry_id) ON DELETE CASCADE
+    );
   `)
 
 }

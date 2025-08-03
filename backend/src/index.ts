@@ -6,30 +6,30 @@ import suggestionRoutes from './routes/suggestionRoutes';
 import moodRoutes from './routes/moodRoutes';
 
 const app = express();
-const PORT = 5000;
+const PORT = 3001;
 
 app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/journals', journalRoutes);
+app.use('/api/journal', journalRoutes);
 app.use('/api/suggestions', suggestionRoutes);
 app.use('/api/moods', moodRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Backend API is running 🚀');
+  res.send('Backend API is running.');
 });
 
 async function startServer() {
   try {
     await initDB();
-    console.log('✅ Database initialized');
+    console.log('Database initialized.');
     
     app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}.`);
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
 }

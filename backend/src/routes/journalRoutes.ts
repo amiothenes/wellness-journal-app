@@ -3,8 +3,11 @@ import * as journalController from '../controllers/journalController';
 
 const router = Router();
 
-router.get('/', journalController.getAllEntries);
+router.get('/entries', journalController.getAllEntries);
+router.get('/entries/:entryId/paragraphs', journalController.getAllParagraphs);
 router.post('/', journalController.createEntry);
-router.delete('/:id', journalController.deleteEntry);
+router.post('/entries/:entryId/paragraphs',journalController.createParagraph);
+router.delete('/entries/:entryId', journalController.deleteEntry);
+router.delete('/paragraphs/:paragraphId', journalController.deleteParagraph);
 
 export default router;
