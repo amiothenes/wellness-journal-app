@@ -28,14 +28,14 @@ body {
   z-index: -1;
 }
 
-/* Entries Container */
-.entries-container {
+/* Paragraphs Container */
+.paragraphs-display {
   width: 100%;
   max-width: 900px;
   margin: 0 auto 20px;
 }
 
-.entry {
+.paragraph-item {
   background: white;
   padding: 20px;
   border-radius: 8px;

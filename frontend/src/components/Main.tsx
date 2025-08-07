@@ -31,7 +31,8 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
     }
 
   return (
-    <div>
+    <div className='main'>
+        <div className='main-background'></div>
         <div className="paragraphs-display">
             {(savedEntry?.paragraphs || []).map((paragraph) => (
                 <div key={paragraph.paragraph_id} className="paragraph-item">
@@ -46,21 +47,36 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
         </div>
         <form onSubmit={handleSubmit}>
             <textarea rows={10}
-                        placeholder="What's on your mind?"
-                        onChange={handleCurrentEntry}
-                        value={currentEntry}>
-                        </textarea>
-            <div className="mood-selector">
-                <span>1</span><input type="range"
-                                        min={1}
-                                        max={10}
-                                        step={1}
-                                        value={currentMood}
-                                        onChange={handleMood}
-                ></input><span>10</span>
-                <p>{currentMood}</p>
+                placeholder="What's on your mind?"
+                onChange={handleCurrentEntry}
+                value={currentEntry}>
+            </textarea>
+            <div className="mood-selector-container">
+                <span className="mood-label">Select Mood:</span>
+                <div className="mood-slider">
+                    <div className='slider-container'>
+                        <div className='slider-track'></div>
+                        <span className='slider-min-max'>1</span>
+                        <div className='slider-ticks'>
+                            {[...Array(10)].map((_, i) => (
+                                <div key={i} className='slider-tick'></div>
+                            ))}
+                        </div>
+                        <input type="range"
+                            min={1}
+                            max={10}
+                            step={1}
+                            value={currentMood}
+                            onChange={handleMood}
+                        ></input>
+                        <span className='slider-min-max'>10</span>
+                    </div>
+                    <div className='slider-value'>{currentMood}</div>
+                </div>
+                <button type="submit" className="save-button" aria-label="Save entry">
+                    <span className="visually-hidden">Save</span>
+                </button>
             </div>
-            <button>Save</button>
         </form>
     </div>
   );
