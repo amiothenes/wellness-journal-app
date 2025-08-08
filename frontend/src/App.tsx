@@ -9,6 +9,16 @@ function App() {
 
   const [allEntries, setAllEntries] = React.useState<JournalEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = React.useState<JournalEntry | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   useEffect(() => {
     // Load entries on component mount
     journalAPI.getAllEntries()
@@ -156,17 +166,23 @@ function App() {
   }
 
   return (
-    
     <div className="App">
+      <button className="theme-toggle" onClick={toggleTheme}>
+        {isDarkMode ? '☀️' : '🌙'}
+      </button>
+      <div className='sidebar-container'>
         <Sidebar 
           allEntries={allEntries}
           onEntryClick={handleClick}
           onNewEntry={handleNewEntry}
           onDelete={handleEntryDelete}/>
+      </div>
+      <div className='main-container'>
         <Main
           selectedEntry={selectedEntry}
           onSave={handleSave}
           onDelete={handleParagraphDelete}/>
+      </div>
     </div>
   );
 }

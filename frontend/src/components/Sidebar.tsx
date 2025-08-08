@@ -21,7 +21,12 @@ function Sidebar({allEntries, onEntryClick, onNewEntry, onDelete}: SidebarProps)
             <div>
               {new Date(entry.timestamp).toLocaleDateString()}
             </div>
-            <button className='sidebar-entry-delete' onClick={() => onDelete(entry)}>Delete</button>
+            <button
+              className='sidebar-entry-delete'
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(entry)
+              }}>Delete</button>
           </div>
         ))}
       </div>

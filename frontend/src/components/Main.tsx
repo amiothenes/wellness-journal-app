@@ -74,7 +74,7 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
                     <div className='slider-value'>{currentMood}</div>
                 </div>
                 <button type="submit" className="save-button" aria-label="Save entry">
-                    <span className="visually-hidden">Save</span>
+                    <span className="">Save</span>
                 </button>
             </div>
         </form>
