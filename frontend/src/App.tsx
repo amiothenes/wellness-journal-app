@@ -173,6 +173,7 @@ function App() {
       <div className='sidebar-container'>
         <Sidebar 
           allEntries={allEntries}
+          selectedEntry={selectedEntry}
           onEntryClick={handleClick}
           onNewEntry={handleNewEntry}
           onDelete={handleEntryDelete}/>

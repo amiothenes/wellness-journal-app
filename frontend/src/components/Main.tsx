@@ -30,6 +30,38 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
         setCurrentMood(5);
     }
 
+    const getMoodColor = (mood: number): string => {
+        const colors = [
+            '#dc2626',
+            '#dc2626',
+            '#ea580c',
+            '#f59e0b',
+            '#eab308',
+            '#84cc16',
+            '#22c55e',
+            '#16a34a',
+            '#059669',
+            '#047857' 
+        ];
+        return colors[mood - 1] || colors[4]; // Default to (5)
+    };
+
+    const getBgMoodColor = (mood: number): string => {
+        const bgColors = [
+            '#fee2e2',
+            '#fee2e2',
+            '#ffedd5',
+            '#fef3c7',
+            '#fef9c3',
+            '#ecfccb',
+            '#d1fae5',
+            '#bbf7d0',
+            '#a7f3d0',
+            '#ccfbf1'
+        ];
+        return bgColors[mood - 1] || bgColors[4]; // Default to (5)
+    };
+
   return (
     <div className='main'>
         <div className='main-background'></div>
@@ -38,7 +70,12 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
                 <div key={paragraph.paragraph_id} className="paragraph-item">
                     <p>{paragraph.text}</p>
                     <div className="paragraph-meta">
-                        <span>Mood: {paragraph.mood}/10</span>
+                        <span className='mood-badge'
+                            style={{backgroundColor: getBgMoodColor(paragraph.mood),
+                                    color: getMoodColor(paragraph.mood)
+                            }}>
+                            Mood: {paragraph.mood}/10
+                        </span>
                         <span>{new Date(paragraph.timestamp).toLocaleString()}</span>
                         <button className='paragraph-delete' onClick={() => onDelete(paragraph)}>Delete</button>
                     </div>
@@ -71,7 +108,10 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
                         ></input>
                         <span className='slider-min-max'>10</span>
                     </div>
-                    <div className='slider-value'>{currentMood}</div>
+                    <div className='slider-value'
+                        style={{backgroundColor: getBgMoodColor(currentMood),
+                                    color: getMoodColor(currentMood)
+                            }}>{currentMood}</div>
                 </div>
                 <button type="submit" className="save-button" aria-label="Save entry">
                     <span className="">Save</span>

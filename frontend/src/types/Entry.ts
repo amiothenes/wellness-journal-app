@@ -18,8 +18,9 @@ export interface MainProps {
 }
 
 export interface SidebarProps {
-    allEntries: JournalEntry[]; //how to do type of an array of JournalEntry
-    onEntryClick: (entry: JournalEntry) => void; //see whether that's correct
+    allEntries: JournalEntry[];
+    selectedEntry: JournalEntry | null;
+    onEntryClick: (entry: JournalEntry) => void;
     onNewEntry: () => void;
     onDelete: (entry: JournalEntry) => void;
 }

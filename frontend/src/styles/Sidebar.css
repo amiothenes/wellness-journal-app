@@ -65,6 +65,10 @@
 .sidebar-entry.selected {
   border-color: var(--accent-blue);
   background: var(--accent-blue-light);
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border-left: 4px solid var(--accent-blue); /* Replace the ::before with border */
+  padding-left: calc(1rem - 1px); /* Adjust padding to compensate */
 }
 
 .entry-date {
