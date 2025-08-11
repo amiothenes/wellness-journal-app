@@ -1,23 +1,61 @@
 import React from 'react';
 import '../styles/Sidebar.css';
 import {SidebarProps} from '../types/Entry';
+import { formatEntryDate, isToday } from '../utils/dateUtils';
+import { calculateLiveMood, getMoodColor,getBgMoodColor } from '../utils/moodUtils';
 
-function Sidebar({allEntries, selectedEntry, onEntryClick, onNewEntry, onDelete}: SidebarProps) {
+function Sidebar({allEntries, selectedEntry, onEntryClick, onNewEntry, onDelete, canCreateNewEntry}: SidebarProps) {
+
+  const getDisplayMood = (entry: any): number | null => {
+    // For today's entry, calculate live if it's selected and has paragraphs
+
+    if (!selectedEntry) {
+      return null;
+    }
+
+    if (isToday(entry.timestamp) && selectedEntry?.entry_id === entry.entry_id) {
+      return calculateLiveMood(selectedEntry.paragraphs);
+    }
+    // For past entries, use stored avg_mood
+    return entry.avg_mood;
+  };
 
   return (
     <div className='sidebar'>
-      <button className='new-entry-button' onClick={onNewEntry}>Create New Entry</button>
+      <button 
+        className={`new-entry-button ${!canCreateNewEntry ? 'disabled' : ''}`}
+        onClick={onNewEntry}
+        disabled={!canCreateNewEntry}>
+          {canCreateNewEntry ? 'Create New Entry' : 'Today\'s Entry Exists'}
+      </button>
       <div className='sidebar-entries'>
-        {allEntries.map((entry) => (
+        {allEntries.map((entry) => {
+          const mood = getDisplayMood(entry);
+          const isTodaysEntry = isToday(entry.timestamp);
+          const isSelected = selectedEntry?.entry_id === entry.entry_id;
+          return (
           <div 
             key={entry.entry_id} 
-            className={`sidebar-entry ${selectedEntry?.entry_id === entry.entry_id ? 'selected' : ''}`}
+            className={`sidebar-entry ${isSelected ? 'selected' : ''} ${isTodaysEntry ? 'today' : ''}`}
             onClick={() => onEntryClick(entry)}
           >
-            Entry
             <div className='entry-date'>
-              {new Date(entry.timestamp).toLocaleDateString()}
+              {formatEntryDate(entry.timestamp)}
             </div>
+            <div className="avg-mood">
+                {mood ? (
+                  <>
+                    <span 
+                      className="mood-badge"
+                      style={{backgroundColor: getBgMoodColor(mood) , color: getMoodColor(mood) }}
+                    >
+                      {mood.toFixed(1)}
+                    </span>
+                  </>
+                ) : (
+                  <span className="mood-indicator no-mood">No entries yet</span>
+                )}
+              </div>
             <button
               className='sidebar-entry-delete'
               onClick={(e) => {
@@ -25,7 +63,7 @@ function Sidebar({allEntries, selectedEntry, onEntryClick, onNewEntry, onDelete}
                 onDelete(entry)
               }}>Delete</button>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { initDB } from './db';
 import journalRoutes from './routes/journalRoutes';
 import suggestionRoutes from './routes/suggestionRoutes';
 import moodRoutes from './routes/moodRoutes';
+import { finalizeOldEntries } from './controllers/journalController';
 
 const app = express();
 const PORT = 3001;
@@ -24,6 +25,17 @@ async function startServer() {
   try {
     await initDB();
     console.log('Database initialized.');
+
+    console.log('Checking for old entries to finalize...');
+    await finalizeOldEntries();
+
+    const runDailyFinalization = () => {
+      console.log('Running daily finalization job...');
+      finalizeOldEntries();
+    };
+    
+    // every 24 hours
+    setInterval(runDailyFinalization, 24 * 60 * 60 * 1000);
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}.`);

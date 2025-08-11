@@ -33,6 +33,18 @@
   font-size: 0.875rem;
 }
 
+.new-entry-button.disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.new-entry-button.disabled:hover {
+  background: var(--text-muted);
+  transform: none;
+  box-shadow: none;
+}
+
 .new-entry-button:hover {
   background: var(--accent-blue-hover);
   transform: translateY(-1px);
@@ -54,6 +66,59 @@
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sidebar-entry.today {
+  background: rgba(59, 130, 246, 0.05); /* Very subtle blue background */
+  border-left: 3px solid var(--accent-blue); /* Subtle left border */
+  padding-left: calc(1rem - 3px); /* Adjust padding to compensate for border */
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1); /* Subtle blue shadow */
+}
+
+/* Today's entry when also selected */
+.sidebar-entry.today.selected {
+  background: rgba(59, 130, 246, 0.1); /* Slightly more prominent when selected */
+  border-left: 3px solid var(--accent-blue);
+}
+
+/* Make today's date text slightly bolder */
+.sidebar-entry.today .entry-date {
+  font-weight: 700;
+  color: var(--accent-blue);
+}
+
+.entry-date {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.avg-mood {
+  /* display: flex; */
+  align-items: center;
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.mood-badge {
+  background: var(--accent-blue-light);
+  color: var(--accent-blue);
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.mood-indicator.no-mood {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  font-style: italic;
+  background: none;
 }
 
 .sidebar-entry:hover {

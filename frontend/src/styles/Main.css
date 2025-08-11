@@ -301,6 +301,21 @@ input[type="range"]::-moz-range-thumb {
   margin: auto;
 }
 
+.read-only-message {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  border: 1px dashed var(--accent-blue);
+  border-radius: 0.75rem;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  text-align: center;
+  font-style: italic;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow);
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
 /* Responsive design - mobile */
 @media (max-width: 768px) {
   .mood-selector-container {

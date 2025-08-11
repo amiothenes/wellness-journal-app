@@ -12,7 +12,8 @@ export async function initDB() {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS journal_entries (
       entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      avg_mood REAL DEFAULT NULL
     );
   `);
 
@@ -38,7 +39,7 @@ export async function initDB() {
       suggestion_type_tag TEXT,
       FOREIGN KEY (entry_id) REFERENCES journal_entries(entry_id) ON DELETE CASCADE
     );
-  `)
+  `);
 
 }
 

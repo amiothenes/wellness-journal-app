@@ -46,5 +46,13 @@ export const journalAPI = {
       headers: { 'Content-Type': 'application/json' }
     });
     return response.json();
-  }
+  },
+
+  getTodaysEntry: async () => {
+    const response = await fetch(`${API_BASE}/journal/entries/today`);
+    if (response.status === 404) {
+      return null; // No entry for today
+    }
+    return response.json();
+  },
 };

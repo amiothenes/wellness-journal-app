@@ -2,6 +2,7 @@ export interface JournalEntry {
   entry_id: number;
   timestamp: string;
   paragraphs: ChatParagraph[];
+  avg_mood?: number | null;
 }
 
 export interface ChatParagraph {
@@ -23,4 +24,5 @@ export interface SidebarProps {
     onEntryClick: (entry: JournalEntry) => void;
     onNewEntry: () => void;
     onDelete: (entry: JournalEntry) => void;
+    canCreateNewEntry: boolean;
 }

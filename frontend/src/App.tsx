@@ -4,12 +4,14 @@ import Main from './components/Main'
 import Sidebar from './components/Sidebar';
 import { JournalEntry, ChatParagraph } from './types/Entry';
 import { journalAPI } from './services/api';
+import { isToday } from './utils/dateUtils';
 
 function App() {
 
   const [allEntries, setAllEntries] = React.useState<JournalEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = React.useState<JournalEntry | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [todaysEntryExists, setTodaysEntryExists] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
@@ -20,25 +22,36 @@ function App() {
   };
 
   useEffect(() => {
-    // Load entries on component mount
-    journalAPI.getAllEntries()
-      .then(async entries => {
-        setAllEntries(entries)
+    const loadData = async () => {
+      try {
+        // Load all entries
+        const entries = await journalAPI.getAllEntries();
+        setAllEntries(entries);
+        
+        // Check if today's entry exists
+        const todaysEntry = await journalAPI.getTodaysEntry();
+        setTodaysEntryExists(todaysEntry !== null);
+        
+        // Prioritize loading today's entry if it exists, otherwise load the first entry
         if (entries.length > 0) {
-          //load paragraphs for first entry
+          const entryToLoad = todaysEntry || entries[0];
           try {
-            const paragraphs = await journalAPI.getEntryParagraphs(entries[0].entry_id);
+            const paragraphs = await journalAPI.getEntryParagraphs(entryToLoad.entry_id);
             setSelectedEntry({
-              ...entries[0],
+              ...entryToLoad,
               paragraphs: paragraphs
-          });
-        } catch (error) {
-          console.error('Failed to load paragraphs for first entry:', error);
-          setSelectedEntry({ ...entries[0], paragraphs: [] });
+            });
+          } catch (error) {
+            console.error('Failed to load paragraphs for entry:', error);
+            setSelectedEntry({ ...entryToLoad, paragraphs: [] });
+          }
         }
+      } catch (error) {
+        console.error('Failed to load data:', error);
       }
-      })
-      .catch(error => console.error('Failed to load entries:', error));
+    };
+    
+    loadData();
   }, []);
   
   // user clicks side bar journalEntry date from list and it loads it as selectedEntry
@@ -60,26 +73,28 @@ function App() {
       setSelectedEntry({ ...entry, paragraphs: [] });
     }
   }
-  // ...existing code...
-  // user saves the form - updating selectedEntry AND/OR adding to allEntries
 
   const handleNewEntry = async () => {
+    if (todaysEntryExists) {
+      return;
+    }
     // Create new entry via API
-      try {
-        const newEntry = await journalAPI.createEntry();
-        
-        // Convert API response to frontend format
-        const formattedEntry: JournalEntry = {
-          entry_id: newEntry.entry_id,
-          timestamp: new Date().toISOString(),
-          paragraphs: []
-        };
-        
-        setAllEntries([formattedEntry, ...allEntries]);
-        setSelectedEntry(formattedEntry);
-      } catch (error) {
-        console.error('Failed to create entry:', error);
-      }
+    try {
+      const newEntry = await journalAPI.createEntry();
+      
+      // Convert API response to frontend format
+      const formattedEntry: JournalEntry = {
+        entry_id: newEntry.entry_id,
+        timestamp: new Date().toISOString(),
+        paragraphs: []
+      };
+      
+      setAllEntries([formattedEntry, ...allEntries]);
+      setSelectedEntry(formattedEntry);
+      setTodaysEntryExists(true);
+    } catch (error) {
+      console.error('Failed to create entry:', error);
+    }
   }
 
   const handleSave = async (mood: number, text: string) => {
@@ -133,6 +148,11 @@ function App() {
         if (selectedEntry?.entry_id === entry.entry_id) {
           setSelectedEntry(updatedEntries.length > 0 ? updatedEntries[0] : null);
         }
+
+      if (isToday(entry.timestamp)) {
+        setTodaysEntryExists(false);
+      }
+
       } catch (error) {
         console.error('Failed to delete paragraph:', error);
       }
@@ -176,7 +196,8 @@ function App() {
           selectedEntry={selectedEntry}
           onEntryClick={handleClick}
           onNewEntry={handleNewEntry}
-          onDelete={handleEntryDelete}/>
+          onDelete={handleEntryDelete}
+          canCreateNewEntry={!todaysEntryExists}/>
       </div>
       <div className='main-container'>
         <Main

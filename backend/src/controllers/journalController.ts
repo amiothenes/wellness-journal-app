@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { getDB } from '../db';
-import { CreateJournalEntryRequest } from '../models/JournalEntry';
 
 export const getAllEntries = async (req: Request, res: Response) => {
   try {
@@ -117,5 +116,74 @@ export const deleteParagraph = async (req: Request, res: Response) => {
     res.json({ message: 'Paragraph deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete paragraph' });
+  }
+};
+
+export const getTodaysEntry = async (req: Request, res: Response) => {
+  try {
+    const db = getDB();
+    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+    
+    const entry = await db.get(
+      `SELECT * FROM journal_entries 
+       WHERE DATE(timestamp) = ? 
+       ORDER BY timestamp DESC LIMIT 1`,
+      [today]
+    );
+    
+    if (entry) {
+      // Get paragraphs for today's entry
+      const paragraphs = await db.all(
+        'SELECT * FROM chat_paragraphs WHERE entry_id = ? ORDER BY timestamp ASC',
+        [entry.entry_id]
+      );
+      
+      res.json({ ...entry, paragraphs });
+    } else {
+      res.status(404).json({ message: 'No entry found for today' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch today\'s entry' });
+  }
+};
+
+// Helper function to calculate average mood
+const calculateAverageMood = async (entryId: number): Promise<number | null> => {
+  const db = getDB();
+  const result = await db.get(
+    'SELECT AVG(mood) as avg_mood, COUNT(*) as count FROM chat_paragraphs WHERE entry_id = ?',
+    [entryId]
+  );
+  
+  return result.count > 0 ? Math.round(result.avg_mood * 10) / 10 : null;
+};
+
+// Function to finalize old entries (calculate and store avg_mood)
+export const finalizeOldEntries = async () => {
+  try {
+    const db = getDB();
+    
+    // Find entries from previous days that don't have avg_mood calculated
+    const oldEntries = await db.all(`
+      SELECT entry_id FROM journal_entries 
+      WHERE DATE(timestamp) < DATE('now') 
+      AND avg_mood IS NULL
+    `);
+    
+    console.log(`Finalizing ${oldEntries.length} old entries...`);
+    
+    for (const entry of oldEntries) {
+      const avgMood = await calculateAverageMood(entry.entry_id);
+      await db.run(
+        'UPDATE journal_entries SET avg_mood = ? WHERE entry_id = ?',
+        [avgMood, entry.entry_id]
+      );
+    }
+    
+    if (oldEntries.length > 0) {
+      console.log(`Finalized ${oldEntries.length} entries with average moods.`);
+    }
+  } catch (error) {
+    console.error('Error finalizing old entries:', error);
   }
 };
