@@ -58,6 +58,40 @@
   word-wrap: break-word;
 }
 
+.paragraph-item.user-message {
+  background: var(--bg-secondary);
+  border-radius: 1rem 1rem 0.25rem 1rem;
+  padding: 1rem;
+  min-width: 45%;
+  max-width: 75%;
+  align-self: flex-end;
+  margin-left: auto;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+/* AI responses  */
+.paragraph-item.ai-response {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-radius: 1rem 1rem 1rem 0.25rem;
+  padding: 1rem;
+  min-width: 45%;
+  max-width: 75%;
+  align-self: flex-start; /* Left side */
+  margin-right: auto;
+  border: 1px solid #0ea5e9;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+}
+
+.ai-badge {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: white;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  font-size: 0.7rem;
+}
+
 .paragraph-meta {
   display: flex;
   justify-content: space-between;

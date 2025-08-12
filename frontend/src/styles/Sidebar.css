@@ -71,16 +71,16 @@
 }
 
 .sidebar-entry.today {
-  background: rgba(59, 130, 246, 0.05); /* Very subtle blue background */
-  border-left: 3px solid var(--accent-blue); /* Subtle left border */
-  padding-left: calc(1rem - 3px); /* Adjust padding to compensate for border */
-  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1); /* Subtle blue shadow */
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.03), rgba(59, 130, 246, 0.03));
+  box-shadow: 0 1px 3px rgba(34, 197, 94, 0.08);
+  padding-left: calc(1rem - 3px);
 }
 
 /* Today's entry when also selected */
 .sidebar-entry.today.selected {
-  background: rgba(59, 130, 246, 0.1); /* Slightly more prominent when selected */
-  border-left: 3px solid var(--accent-blue);
+  background: var(--accent-blue-light);
+  border-left: 4px solid var(--accent-blue);
+  padding-left: calc(1rem - 1px);
 }
 
 /* Make today's date text slightly bolder */

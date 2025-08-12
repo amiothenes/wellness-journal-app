@@ -55,4 +55,13 @@ export const journalAPI = {
     }
     return response.json();
   },
+
+  createAIResponse: async (entryId: number, text: string, triggerParagraphId: number, aiResponseData: any) => {
+    const response = await fetch(`${API_BASE}/journal/ai-response`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entryId, text, triggerParagraphId, aiResponseData })
+    });
+    return response.json();
+  }
 };

@@ -5,6 +5,8 @@ import Sidebar from './components/Sidebar';
 import { JournalEntry, ChatParagraph } from './types/Entry';
 import { journalAPI } from './services/api';
 import { isToday } from './utils/dateUtils';
+import { calculateLiveMood } from './utils/moodUtils';
+import { analyzeSentiment, shouldGenerateResponse, generateAIResponse } from './utils/aiUtils';
 
 function App() {
 
@@ -12,10 +14,21 @@ function App() {
   const [selectedEntry, setSelectedEntry] = React.useState<JournalEntry | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [todaysEntryExists, setTodaysEntryExists] = useState(false);
+  const [moodCache, setMoodCache] = useState<{[entryId: number]: number | null}>({});
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
+
+  useEffect(() => {
+    if (selectedEntry && isToday(selectedEntry.timestamp) && selectedEntry.paragraphs) {
+      const mood = calculateLiveMood(selectedEntry.paragraphs);
+      setMoodCache(prev => ({
+        ...prev,
+        [selectedEntry.entry_id]: mood
+      }));
+    }
+  }, [selectedEntry]);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -102,32 +115,84 @@ function App() {
       await handleNewEntry();
       return;
     }
-
+  
     try {
       await journalAPI.addParagraph(selectedEntry.entry_id, mood, text);
       
-      // Update local state
       const existingParagraphs = selectedEntry.paragraphs || [];
-      const newParagraph = {
-      paragraph_id: existingParagraphs.length > 0 
-        ? Math.max(...existingParagraphs.map(p => p.paragraph_id)) + 1 
-        : 1,
-      timestamp: new Date().toISOString(),
-      text: text,
-      mood: mood
-    };
-      
-      const updatedEntry = {
-        ...selectedEntry,
-        paragraphs: [...existingParagraphs, newParagraph]
+      const newParagraph: ChatParagraph = {
+        paragraph_id: existingParagraphs.length > 0 
+          ? Math.max(...existingParagraphs.map(p => p.paragraph_id)) + 1 
+          : 1,
+        timestamp: new Date().toISOString(),
+        text: text,
+        mood: mood,
+        paragraph_type: "user"
       };
       
-      const updatedEntries = allEntries.map(entry =>
-        entry.entry_id === selectedEntry.entry_id ? updatedEntry : entry
-      );
+      
+    let updatedParagraphs = [...existingParagraphs, newParagraph];
+    
+    // Check if AI should respond
+    const sentiment = analyzeSentiment(text, mood);
+    // if (sentiment.threshold_met && shouldGenerateResponse(existingParagraphs)) {
+    if (true) {
+      try {
+        const aiResponseText = generateAIResponse(sentiment, text);
+        const aiResponseData = {
+          sentiment_score: sentiment.score,
+          response_type: sentiment.suggested_response_type,
+          confidence: 0.8
+        };
+        
+        // Save AI response to backend
+        const aiResponse = await journalAPI.createAIResponse(
+          selectedEntry.entry_id, 
+          aiResponseText, 
+          newParagraph.paragraph_id,
+          aiResponseData
+        );
+        
+        // Add AI response to local state
+        updatedParagraphs.push({
+          paragraph_id: aiResponse.paragraph_id,
+          timestamp: aiResponse.timestamp,
+          text: aiResponse.text,
+          mood: 5,
+          paragraph_type: "ai_response",
+          trigger_paragraph_id: newParagraph.paragraph_id,
+          ai_response_data: aiResponseData
+        });
+      } catch (error) {
+        console.error('Failed to generate AI response:', error);
+      }
+    }
+    
+    const updatedEntry = {
+      ...selectedEntry,
+      paragraphs: updatedParagraphs
+    };
+    
+    const updatedEntries = allEntries.map(entry =>
+      entry.entry_id === selectedEntry.entry_id ? updatedEntry : entry
+    );
       
       setAllEntries(updatedEntries);
       setSelectedEntry(updatedEntry);
+      
+      // If this is today's entry and it's the first paragraph, mark today's entry as existing
+      if (isToday(selectedEntry.timestamp) && existingParagraphs.length === 0) {
+        setTodaysEntryExists(true);
+      }
+  
+      // After successful save, update mood cache if it's today's entry
+      if (selectedEntry && isToday(selectedEntry.timestamp)) {
+        const updatedMood = calculateLiveMood(updatedEntry.paragraphs.filter(p => p.paragraph_type === 'user'));
+        setMoodCache(prev => ({
+          ...prev,
+          [selectedEntry.entry_id]: updatedMood
+        }));
+      }
     } catch (error) {
       console.error('Failed to add paragraph:', error);
     }
@@ -146,7 +211,21 @@ function App() {
 
         // If deleted entry was selected, clear selection or select another
         if (selectedEntry?.entry_id === entry.entry_id) {
-          setSelectedEntry(updatedEntries.length > 0 ? updatedEntries[0] : null);
+          if (updatedEntries.length > 0) {
+            // Fetch paragraphs for the new selected entry
+            try {
+              const paragraphs = await journalAPI.getEntryParagraphs(updatedEntries[0].entry_id);
+              setSelectedEntry({
+                ...updatedEntries[0],
+                paragraphs: paragraphs
+              });
+            } catch (error) {
+              console.error('Failed to load paragraphs for new selected entry:', error);
+              setSelectedEntry({ ...updatedEntries[0], paragraphs: [] });
+            }
+          } else {
+            setSelectedEntry(null);
+          }
         }
 
       if (isToday(entry.timestamp)) {
@@ -197,7 +276,8 @@ function App() {
           onEntryClick={handleClick}
           onNewEntry={handleNewEntry}
           onDelete={handleEntryDelete}
-          canCreateNewEntry={!todaysEntryExists}/>
+          canCreateNewEntry={!todaysEntryExists}
+          moodCache={moodCache}/>
       </div>
       <div className='main-container'>
         <Main

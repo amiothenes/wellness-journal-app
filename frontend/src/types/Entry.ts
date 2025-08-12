@@ -10,6 +10,13 @@ export interface ChatParagraph {
   timestamp: string;
   text: string;
   mood: number;
+  paragraph_type: 'user' | 'ai_response';
+  trigger_paragraph_id?: number;
+  ai_response_data?: {
+    sentiment_score?: number;
+    response_type?: 'acknowledgment' | 'coping_strategy' | 'therapy_suggestion';
+    confidence?: number;
+  };
 }
 
 export interface MainProps {
@@ -25,4 +32,5 @@ export interface SidebarProps {
     onNewEntry: () => void;
     onDelete: (entry: JournalEntry) => void;
     canCreateNewEntry: boolean;
+    moodCache: {[entryId: number]: number | null};
 }

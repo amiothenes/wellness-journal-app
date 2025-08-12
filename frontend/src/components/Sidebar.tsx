@@ -2,22 +2,20 @@ import React from 'react';
 import '../styles/Sidebar.css';
 import {SidebarProps} from '../types/Entry';
 import { formatEntryDate, isToday } from '../utils/dateUtils';
-import { calculateLiveMood, getMoodColor,getBgMoodColor } from '../utils/moodUtils';
+import { getMoodColor,getBgMoodColor } from '../utils/moodUtils';
 
-function Sidebar({allEntries, selectedEntry, onEntryClick, onNewEntry, onDelete, canCreateNewEntry}: SidebarProps) {
+function Sidebar({allEntries, selectedEntry, onEntryClick, onNewEntry, onDelete, canCreateNewEntry, moodCache}: SidebarProps) {
 
   const getDisplayMood = (entry: any): number | null => {
-    // For today's entry, calculate live if it's selected and has paragraphs
-
-    if (!selectedEntry) {
-      return null;
+    if (isToday(entry.timestamp)) {
+      return moodCache[entry.entry_id] ?? null;
     }
-
-    if (isToday(entry.timestamp) && selectedEntry?.entry_id === entry.entry_id) {
-      return calculateLiveMood(selectedEntry.paragraphs);
-    }
+    
     // For past entries, use stored avg_mood
-    return entry.avg_mood;
+    if (entry.avg_mood !== null && entry.avg_mood !== undefined) {
+      return entry.avg_mood;
+    }
+    return null;
   };
 
   return (

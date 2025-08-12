@@ -20,23 +20,13 @@ export async function initDB() {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS chat_paragraphs (
       paragraph_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      entry_id INTEGER NOT NULL, --journal_entry foreign key
+      entry_id INTEGER NOT NULL,
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
       text TEXT,
       mood INTEGER,
-      FOREIGN KEY (entry_id) REFERENCES journal_entries(entry_id) ON DELETE CASCADE
-    );
-  `);
-  
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS coping_suggestions (
-      suggestion_id INTEGER PRIMARY KEY AUTOINCREMENT,
-      entry_id INTEGER NOT NULL, --journal_entry foreign key
-      related_paragraphs TEXT, -- JSON array: "[1,3,5,7]"
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-      text TEXT NOT NULL,
-      emotion_tag TEXT,
-      suggestion_type_tag TEXT,
+      paragraph_type TEXT DEFAULT 'user', -- Add this field
+      trigger_paragraph_id INTEGER DEFAULT NULL, -- Add this field
+      ai_response_data TEXT DEFAULT NULL, -- Add this field for JSON data
       FOREIGN KEY (entry_id) REFERENCES journal_entries(entry_id) ON DELETE CASCADE
     );
   `);

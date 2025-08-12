@@ -53,7 +53,7 @@ export const createEntry = async (req: Request, res: Response) => {
 export const createParagraph = async (req: Request, res: Response) => {
   try {
     const { entryId } = req.params;
-    const { mood, text } = req.body;
+    const { mood, text, paragraph_type='user' } = req.body;
     
     const numericEntryId = parseInt(entryId);
     if (isNaN(numericEntryId) || numericEntryId <= 0) {
@@ -185,5 +185,31 @@ export const finalizeOldEntries = async () => {
     }
   } catch (error) {
     console.error('Error finalizing old entries:', error);
+  }
+};
+
+export const createAIResponse = async (req: Request, res: Response) => {
+  try {
+    const { entryId, text, triggerParagraphId, aiResponseData } = req.body;
+    const db = getDB();
+    
+    const result = await db.run(
+      `INSERT INTO chat_paragraphs (entry_id, timestamp, text, mood, paragraph_type, trigger_paragraph_id, ai_response_data) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [entryId, new Date().toISOString(), text, 5, 'ai_response', triggerParagraphId, JSON.stringify(aiResponseData)]
+    );
+    
+    res.json({ 
+      paragraph_id: result.lastID,
+      entry_id: entryId,
+      timestamp: new Date().toISOString(),
+      text: text,
+      mood: 5,
+      paragraph_type: 'ai_response',
+      trigger_paragraph_id: triggerParagraphId,
+      ai_response_data: aiResponseData
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create AI response' });
   }
 };
