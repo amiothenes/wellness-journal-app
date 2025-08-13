@@ -1,0 +1,201 @@
+.toggle-graph-btn {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  box-shadow: var(--shadow);
+  height: 48px;
+  min-height: 48px;
+  font-family: inherit, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.toggle-graph-btn.active {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+.toggle-graph-btn:hover {
+  background: var(--accent-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+/* MoodGraph page styling */
+.mood-graph-page {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+}
+
+.main-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  z-index: -1;
+}
+
+.mood-graph-header {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 2rem 1rem 2rem;
+  background: var(--bg-secondary);
+  border-radius: 1rem 1rem 0 0;
+  box-shadow: var(--shadow);
+  margin-top: 2rem;
+}
+
+.mood-graph-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mood-graph-calendar {
+  width: 100%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 24px;
+  background: var(--bg-secondary);
+  border-radius: 0 0 1rem 1rem;
+  box-shadow: var(--shadow);
+  padding: 32px 32px 32px 32px;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+}
+
+.mood-graph-day {
+  min-height: 120px;
+  text-align: center;
+  padding: 24px 12px;
+  border-radius: 20px;
+  box-sizing: border-box;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  box-shadow: var(--shadow);
+  min-width: 120px;
+.mood-graph-day--bg {
+  background: #f3f4f6;
+}
+
+.mood-graph-day--outside {
+  opacity: 0.5;
+}
+  font-weight: bold;
+  min-height: 80px;
+  padding: 16px 0;
+  background: #f3f4f6;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.mood-graph-date {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.mood-graph-mood {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+  background: var(--accent-blue-light);
+  border-radius: 12px;
+  padding: 12px 24px;
+  min-width: 2rem;
+  text-align: center;
+  margin-top: 12px;
+  display: inline-block;
+}
+
+.mood-graph-chart {
+  width: 100%;
+  max-width: 1200px;
+  background: var(--bg-secondary);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  margin-top: 40px;
+  height: 480px;
+}
+
+.save-button {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 0.85rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  white-space: nowrap;
+  height: 48px;
+  min-height: 48px;
+  font-family: inherit, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.save-button:hover {
+  background: var(--accent-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 900px) {
+  .mood-graph-header,
+  .mood-graph-calendar,
+  .mood-graph-chart {
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .mood-graph-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+  .mood-graph-calendar {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+  .mood-graph-day {
+    min-width: 100%;
+  }
+  .mood-graph-chart {
+    padding: 1rem;
+  }
+}

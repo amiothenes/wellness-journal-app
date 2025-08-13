@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react';
+import { Routes, Route } from 'react-router-dom';
+import MoodGraph from './components/MoodGraph';
 import './styles/App.css';
 import Main from './components/Main'
 import Sidebar from './components/Sidebar';
@@ -265,27 +267,36 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <button className="theme-toggle" onClick={toggleTheme}>
-        {isDarkMode ? '☀️' : '🌙'}
-      </button>
-      <div className='sidebar-container'>
-        <Sidebar 
-          allEntries={allEntries}
-          selectedEntry={selectedEntry}
-          onEntryClick={handleClick}
-          onNewEntry={handleNewEntry}
-          onDelete={handleEntryDelete}
-          canCreateNewEntry={!todaysEntryExists}
-          moodCache={moodCache}/>
-      </div>
-      <div className='main-container'>
-        <Main
-          selectedEntry={selectedEntry}
-          onSave={handleSave}
-          onDelete={handleParagraphDelete}/>
-      </div>
-    </div>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <div className="App">
+            <button className="theme-toggle" onClick={toggleTheme}>
+              {isDarkMode ? '☀️' : '🌙'}
+            </button>
+            <div className='sidebar-container'>
+              <Sidebar 
+                allEntries={allEntries}
+                selectedEntry={selectedEntry}
+                onEntryClick={handleClick}
+                onNewEntry={handleNewEntry}
+                onDelete={handleEntryDelete}
+                canCreateNewEntry={!todaysEntryExists}
+                moodCache={moodCache}
+              />
+            </div>
+            <div className='main-container'>
+              <Main
+                selectedEntry={selectedEntry}
+                onSave={handleSave}
+                onDelete={handleParagraphDelete}/>
+            </div>
+          </div>
+        }
+      />
+      <Route path="/mood-graph" element={<MoodGraph entries={allEntries} />} />
+    </Routes>
   );
 }
 
