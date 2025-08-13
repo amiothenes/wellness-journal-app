@@ -3,6 +3,7 @@ import { JournalEntry } from '../types/Entry';
 import { addWeeks, subWeeks, addMonths, subMonths, startOfWeek, startOfMonth, format, eachDayOfInterval, getDay, getMonth, getYear } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import '../styles/MoodGraph.css';
+import {getMoodColor, getBgMoodColor} from '../utils/moodUtils';
 
 function getMoodForDate(dateStr: string, entries: JournalEntry[]) {
   // Find the entry for the date
@@ -48,38 +49,6 @@ function MoodGraph({ entries }: { entries: JournalEntry[] }) {
   const handleNext = () => {
     setCurrentDate(view === 'week' ? addWeeks(currentDate, 1) : addMonths(currentDate, 1));
   };
-
-  const getMoodColor = (mood: number): string => {
-        const colors = [
-            '#dc2626',
-            '#dc2626',
-            '#ea580c',
-            '#f59e0b',
-            '#eab308',
-            '#84cc16',
-            '#22c55e',
-            '#16a34a',
-            '#059669',
-            '#047857' 
-        ];
-        return colors[mood - 1] || colors[4]; // Default to (5)
-    };
-
-    const getBgMoodColor = (mood: number): string => {
-        const bgColors = [
-            '#fee2e2',
-            '#fee2e2',
-            '#ffedd5',
-            '#fef3c7',
-            '#fef9c3',
-            '#ecfccb',
-            '#d1fae5',
-            '#bbf7d0',
-            '#a7f3d0',
-            '#ccfbf1'
-        ];
-        return bgColors[mood - 1] || bgColors[4]; // Default to (5)
-    };
 
   return (
     <div className="main mood-graph-page">
