@@ -99,7 +99,6 @@
   color: #dc2626;
 }
 
-/* Fixed bottom form - matching your structure */
 form {
   border-top: 1px solid var(--border-color);
   background: var(--bg-secondary);
