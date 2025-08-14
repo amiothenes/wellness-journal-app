@@ -72,24 +72,32 @@
 
 /* AI responses  */
 .paragraph-item.ai-response {
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  background: linear-gradient(135deg, var(--ai-bg-primary), var(--ai-bg-secondary));
   border-radius: 1rem 1rem 1rem 0.25rem;
   padding: 1rem;
   min-width: 45%;
   max-width: 75%;
   align-self: flex-start; /* Left side */
   margin-right: auto;
-  border: 1px solid #0ea5e9;
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+  border: 1px solid var(--ai-border);
+  box-shadow: 0 2px 8px var(--ai-shadow);
+}
+
+.paragraph-item.ai-response p {
+  color: var(--ai-text);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.5;
+  word-wrap: break-word;
 }
 
 .ai-badge {
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
-  color: white;
+  background: var(--ai-badge-bg);
+  color: var(--ai-badge-text);
   padding: 0.125rem 0.5rem;
   border-radius: 0.75rem;
   font-weight: 500;
   font-size: 0.7rem;
+  box-shadow: var(--shadow);
 }
 
 .paragraph-meta {
@@ -133,7 +141,6 @@
   color: #dc2626;
 }
 
-/* Fixed bottom form - matching your structure */
 form {
   border-top: 1px solid var(--border-color);
   background: var(--bg-secondary);
@@ -170,13 +177,12 @@ textarea::placeholder {
 }
 
 /* Mood selector container */
-.mood-selector-container {
+.bottom-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  justify-content: flex-end;
+  gap: 2rem;
   flex-wrap: wrap;
-  margin-left: 50%;
 }
 
 .mood-label {
@@ -192,6 +198,7 @@ textarea::placeholder {
   display: flex;
   align-items: center;
   gap: 1rem;
+  max-width: 50%;
 }
 
 .slider-container {
@@ -288,32 +295,6 @@ input[type="range"]::-moz-range-thumb {
   text-align: center;
 }
 
-/* Save button */
-.save-button {
-  background: var(--accent-blue);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
-  white-space: nowrap;
-}
-
-.save-button:hover {
-  background: var(--accent-blue-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
-}
-
-.save-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -352,7 +333,7 @@ input[type="range"]::-moz-range-thumb {
 
 /* Responsive design - mobile */
 @media (max-width: 768px) {
-  .mood-selector-container {
+  .bottom-bar {
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;

@@ -8,10 +8,18 @@
     "dev:frontend": "cd frontend && npm start",
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
   },
-  "keywords": ["wellness", "journal", "react", "node"],
+  "keywords": [
+    "wellness",
+    "journal",
+    "react",
+    "node"
+  ],
   "author": "Victor",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "react-icons": "^5.5.0"
   }
 }

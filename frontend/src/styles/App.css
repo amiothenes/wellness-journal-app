@@ -12,6 +12,15 @@
   --accent-blue-light: #eff6ff;
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  --ai-bg-primary: #f0f9ff;
+  --ai-bg-secondary: #e0f2fe;
+  --ai-border: #0ea5e9;
+  --ai-text: #0c4a6e;
+  --ai-badge-bg: #0ea5e9;
+  --ai-badge-text: #ffffff;
+  --ai-shadow: rgba(14, 165, 233, 0.1);
 }
 
 [data-theme="dark"] {
@@ -28,6 +37,15 @@
   --accent-blue-light: #1e3a8a;
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+
+  --ai-bg-primary: #1e3a8a;
+  --ai-bg-secondary: #1e40af;
+  --ai-border: #60a5fa;
+  --ai-text: #dbeafe;
+  --ai-badge-bg: #3b82f6;
+  --ai-badge-text: #ffffff;
+  --ai-shadow: rgba(96, 165, 250, 0.2);
 }
 
 * {
@@ -89,4 +107,30 @@ body {
 .theme-toggle:hover {
   background: var(--bg-tertiary);
   transform: translateY(-1px);
+}
+
+/* Save button & mood graph button */
+.blue-button {
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.blue-button:hover {
+  background: var(--accent-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.blue-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }

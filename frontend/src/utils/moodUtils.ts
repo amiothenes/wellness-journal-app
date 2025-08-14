@@ -1,7 +1,7 @@
 import { ChatParagraph } from '../types/Entry';
 
 export const calculateLiveMood = (paragraphs: ChatParagraph[]): number | null => {
-  if (!paragraphs || paragraphs.length === 0) return 0;
+  if (!paragraphs || paragraphs.length === 0) return null;
   
   const sum = paragraphs.reduce((acc, p) => acc + p.mood, 0);
   return Math.round((sum / paragraphs.length) * 10) / 10;

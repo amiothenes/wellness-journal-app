@@ -180,3 +180,9 @@
   background: #fee2e2;
   color: #dc2626;
 }
+
+.blue-button.mood-graph {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+}

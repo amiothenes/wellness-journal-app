@@ -1,10 +1,12 @@
 import React, {ChangeEvent, FormEvent, useEffect, useState, useRef} from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Main.css';
 import {ChatParagraph, JournalEntry, MainProps} from '../types/Entry';
 import {isToday, isPastDate} from '../utils/dateUtils';
 import {getMoodColor, getBgMoodColor} from '../utils/moodUtils';
 
 function Main({selectedEntry, onSave, onDelete}: MainProps) {
+    const navigate = useNavigate();
     const [currentMood, setCurrentMood] = useState<number>(5);
     const [currentEntry, setCurrentEntry] = useState<string>("");
     const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(selectedEntry);
@@ -104,9 +106,9 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
                     onChange={handleCurrentEntry}
                     value={currentEntry}>
                 </textarea>
-                <div className="mood-selector-container">
-                    <span className="mood-label">Select Mood:</span>
+                <div className="bottom-bar">
                     <div className="mood-slider">
+                        <span className="mood-label">Select Mood:</span>
                         <div className='slider-container'>
                             <div className='slider-track'></div>
                             <span className='slider-min-max'>1</span>
@@ -129,7 +131,7 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
                                         color: getMoodColor(currentMood)
                                 }}>{currentMood}</div>
                     </div>
-                    <button type="submit" className="save-button" disabled={!canSubmit} aria-label="Save entry">
+                    <button type="submit" className="blue-button save" disabled={!canSubmit} aria-label="Save entry">
                         <span className="">Save</span>
                     </button>
                 </div>

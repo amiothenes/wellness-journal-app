@@ -1,11 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Sidebar.css';
 import {SidebarProps} from '../types/Entry';
 import { formatEntryDate, isToday } from '../utils/dateUtils';
 import { getMoodColor,getBgMoodColor } from '../utils/moodUtils';
 
 function Sidebar({allEntries, selectedEntry, onEntryClick, onNewEntry, onDelete, canCreateNewEntry, moodCache}: SidebarProps) {
-
+  const navigate = useNavigate();
   const getDisplayMood = (entry: any): number | null => {
     if (isToday(entry.timestamp)) {
       return moodCache[entry.entry_id] ?? null;
@@ -63,6 +64,14 @@ function Sidebar({allEntries, selectedEntry, onEntryClick, onNewEntry, onDelete,
           </div>
         )})}
       </div>
+      <button
+        className="blue-button mood-graph"
+        aria-label="View Mood Graph"
+        type="button"
+        onClick={() => navigate('/mood-graph')}
+      >
+        Mood Graph
+      </button>
     </div>
   );
 }
