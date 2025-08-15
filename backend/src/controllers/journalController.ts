@@ -151,8 +151,8 @@ export const getTodaysEntry = async (req: Request, res: Response) => {
 const calculateAverageMood = async (entryId: number): Promise<number | null> => {
   const db = getDB();
   const result = await db.get(
-    'SELECT AVG(mood) as avg_mood, COUNT(*) as count FROM chat_paragraphs WHERE entry_id = ?',
-    [entryId]
+    'SELECT AVG(mood) as avg_mood, COUNT(*) as count FROM chat_paragraphs WHERE entry_id = ? AND paragraph_type = ?',
+    [entryId, 'user']
   );
   
   return result.count > 0 ? Math.round(result.avg_mood * 10) / 10 : null;

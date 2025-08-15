@@ -117,14 +117,19 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
                                     <div key={i} className='slider-tick'></div>
                                 ))}
                             </div>
-                            <div className='slider-value'
-                                style={{backgroundColor: getBgMoodColor(currentMood),
-                                            color: getMoodColor(currentMood)
-                                    }}>{currentMood}</div>
+                            <input type="range"
+                                min={1}
+                                max={10}
+                                step={1}
+                                value={currentMood}
+                                onChange={handleMood}
+                            ></input>
+                            <span className='slider-min-max'>10</span>
                         </div>
-                        <button type="submit" className="save-button" disabled={!canSubmit} aria-label="Save entry">
-                            <span className="">Save</span>
-                        </button>
+                        <div className='slider-value'
+                            style={{backgroundColor: getBgMoodColor(currentMood),
+                                        color: getMoodColor(currentMood)
+                                }}>{currentMood}</div>
                     </div>
                     <button type="submit" className="blue-button save" disabled={!canSubmit} aria-label="Save entry">
                         <span className="">Save</span>

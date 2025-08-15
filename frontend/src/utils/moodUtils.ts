@@ -2,9 +2,9 @@ import { ChatParagraph } from '../types/Entry';
 
 export const calculateLiveMood = (paragraphs: ChatParagraph[]): number | null => {
   if (!paragraphs || paragraphs.length === 0) return null;
-  
-  const sum = paragraphs.reduce((acc, p) => acc + p.mood, 0);
-  return Math.round((sum / paragraphs.length) * 10) / 10;
+  const userParagraphs = paragraphs.filter(p => p.paragraph_type !== "ai_response");
+  const sum = userParagraphs.reduce((acc, p) => acc + p.mood, 0);
+  return Math.round((sum / userParagraphs.length) * 10) / 10;
 };
 
 export const getMoodColor = (mood: number): string => {
