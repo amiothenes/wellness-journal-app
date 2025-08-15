@@ -24,7 +24,7 @@ export const getAllParagraphs = async (req: Request, res: Response) => {
 
     const db = getDB();
     const paragraphs = await db.all(
-      'SELECT * FROM chat_paragraphs WHERE entry_id = ? ORDER BY timestamp ASC',
+      'SELECT * FROM chat_paragraphs WHERE entry_id = ? ORDER BY paragraph_id ASC',
       [numericEntryId]
     );
     res.json(paragraphs);
