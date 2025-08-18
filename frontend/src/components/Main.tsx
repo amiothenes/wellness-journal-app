@@ -4,6 +4,7 @@ import '../styles/Main.css';
 import {ChatParagraph, JournalEntry, MainProps} from '../types/Entry';
 import {isToday, isPastDate} from '../utils/dateUtils';
 import {getMoodColor, getBgMoodColor} from '../utils/moodUtils';
+import { journalAPI } from '../services/api';
 
 function Main({selectedEntry, onSave, onDelete}: MainProps) {
     const navigate = useNavigate();
@@ -11,6 +12,7 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
     const [currentEntry, setCurrentEntry] = useState<string>("");
     const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(selectedEntry);
     const [canSubmit, setCanSubmit] = useState<boolean>(false);
+    const [emotionResult, setEmotionResult] = useState<{ emotions: string[], negative: boolean, suggestion: string | null } | null>(null);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const paragraphsDisplayRef = useRef<HTMLDivElement>(null);
@@ -21,7 +23,6 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
     useEffect(() => {
         setSavedEntry(selectedEntry);
         setCurrentEntry("");
-        
         if (!selectedEntry) {
             setCurrentMood(5);
         }
@@ -59,9 +60,15 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
         setCurrentEntry(event.target.value);
     }
 
-    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         onSave(currentMood, currentEntry);
+        try {
+            const result = await journalAPI.predictEmotions(currentEntry);
+            setEmotionResult(result);
+        } catch (err) {
+            setEmotionResult(null);
+        }
         setCurrentEntry("");
         setCurrentMood(5);
     }
@@ -146,6 +153,20 @@ function Main({selectedEntry, onSave, onDelete}: MainProps) {
                     </div>
             </div>
             </form>
+        )}
+        {emotionResult && (
+            <div className="emotion-result">
+                <h3>Predicted Emotions:</h3>
+                <ul>
+                    {emotionResult.emotions.map(e => <li key={e}>{e}</li>)}
+                </ul>
+                {emotionResult.suggestion && (
+                    <div>
+                        <h3>Coping Suggestion:</h3>
+                        <p>{emotionResult.suggestion}</p>
+                    </div>
+                )}
+            </div>
         )}
         {isReadOnly && (
             <div className="read-only-message">

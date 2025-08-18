@@ -63,5 +63,16 @@ export const journalAPI = {
       body: JSON.stringify({ entryId, text, triggerParagraphId, aiResponseData })
     });
     return response.json();
+  },
+
+  // Add this method for emotion prediction
+  predictEmotions: async (text: string) => {
+    const response = await fetch('http://localhost:3001/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!response.ok) throw new Error('Prediction failed');
+    return response.json(); // { emotions: [...], negative: true/false, suggestion: "..." }
   }
 };

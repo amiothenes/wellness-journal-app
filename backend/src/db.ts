@@ -24,13 +24,12 @@ export async function initDB() {
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
       text TEXT,
       mood INTEGER,
-      paragraph_type TEXT DEFAULT 'user', -- Add this field
-      trigger_paragraph_id INTEGER DEFAULT NULL, -- Add this field
-      ai_response_data TEXT DEFAULT NULL, -- Add this field for JSON data
+      paragraph_type TEXT DEFAULT 'user',
+      trigger_paragraph_id INTEGER DEFAULT NULL,
+      ai_response_data TEXT DEFAULT NULL,
       FOREIGN KEY (entry_id) REFERENCES journal_entries(entry_id) ON DELETE CASCADE
     );
   `);
-
 }
 
 export function getDB() {
