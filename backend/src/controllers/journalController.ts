@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { getDB } from '../db';
+import { generateTherapyResponse } from '../services/llmService';
 
 export const getAllEntries = async (req: Request, res: Response) => {
   try {
@@ -188,28 +189,63 @@ export const finalizeOldEntries = async () => {
   }
 };
 
+export const generateAIResponseText = async (req: Request, res: Response) => {
+  try {
+    const { text, mood, emotionType, sentimentScore } = req.body;
+    
+    // Validate input
+    if (!text) {
+      return res.status(400).json({ 
+        error: 'Missing required field: text' 
+      });
+    }
+    
+    // Default values if not provided
+    const moodValue = mood || 5;
+    const emotionTypeValue = emotionType || 'default';
+    const sentimentScoreValue = sentimentScore || 0;
+    
+    const response = await generateTherapyResponse(text, moodValue, emotionTypeValue, sentimentScoreValue);
+    
+    res.json({ response });
+  } catch (error) {
+    console.error('Failed to generate AI response:', error);
+    res.status(500).json({ error: 'Failed to generate AI response' });
+  }
+};
+
 export const createAIResponse = async (req: Request, res: Response) => {
   try {
     const { entryId, text, triggerParagraphId, aiResponseData } = req.body;
-    const db = getDB();
     
+    const numericEntryId = parseInt(entryId);
+    if (isNaN(numericEntryId) || numericEntryId <= 0) {
+      return res.status(400).json({ 
+        error: 'Invalid entry ID.' 
+      });
+    }
+
+    const db = getDB();
+
     const result = await db.run(
-      `INSERT INTO chat_paragraphs (entry_id, timestamp, text, mood, paragraph_type, trigger_paragraph_id, ai_response_data) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [entryId, new Date().toISOString(), text, 5, 'ai_response', triggerParagraphId, JSON.stringify(aiResponseData)]
+      `INSERT INTO chat_paragraphs 
+       (entry_id, text, mood, paragraph_type, trigger_paragraph_id, ai_response_data, timestamp) 
+       VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+      [numericEntryId, text, 5, 'ai_response', triggerParagraphId, JSON.stringify(aiResponseData)]
     );
     
-    res.json({ 
+    res.status(201).json({ 
       paragraph_id: result.lastID,
-      entry_id: entryId,
+      entry_id: numericEntryId,
+      text,
       timestamp: new Date().toISOString(),
-      text: text,
-      mood: 5,
       paragraph_type: 'ai_response',
       trigger_paragraph_id: triggerParagraphId,
-      ai_response_data: aiResponseData
+      ai_response_data: aiResponseData,
+      message: 'AI response created successfully' 
     });
   } catch (error) {
+    console.error('Failed to create AI response:', error);
     res.status(500).json({ error: 'Failed to create AI response' });
   }
 };

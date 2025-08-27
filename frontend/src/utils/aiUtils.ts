@@ -27,28 +27,34 @@ export const analyzeSentiment = (text: string, mood: number): SentimentAnalysis 
   };
 };
 
-// Fake AI response generator
-export const generateAIResponse = (analysis: SentimentAnalysis, userText: string): string => {
-  const responses = {
-    acknowledgment: [
-      "I hear that you're going through a difficult time. Your feelings are valid, and it's okay to feel this way.",
-      "It sounds like you're dealing with some heavy emotions right now. Thank you for sharing this with me.",
-      "I can sense you're struggling. Please know that you're not alone in feeling this way."
-    ],
-    coping_strategy: [
-      "When you're feeling this way, try taking 5 deep breaths and naming 3 things you can see around you. This grounding technique can help.",
-      "Consider going for a short walk outside, even if it's just for 5 minutes. Fresh air and movement can help shift your mindset.",
-      "Try writing down one small thing you're grateful for today. It doesn't have to be big - even something like a warm cup of coffee counts."
-    ],
-    therapy_suggestion: [
-      "These feelings seem quite intense. Have you considered speaking with a mental health professional? They can provide personalized support.",
-      "It might be helpful to reach out to a counselor or therapist who can work with you on coping strategies tailored to your situation.",
-      "Consider calling a mental health helpline if you need someone to talk to right now. The National Suicide Prevention Lifeline is 988."
-    ]
-  };
-  
-  const responseArray = responses[analysis.suggested_response_type];
-  return responseArray[Math.floor(Math.random() * responseArray.length)];
+export const generateAIResponse = async (
+  // analysis: SentimentAnalysis, 
+  userText: string,
+  mood: number
+): Promise<string> => {
+  try {
+    const response = await fetch('http://localhost:3001/api/journal/ai-response/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: userText,
+        mood: mood,
+        emotionType: 'default', //TODO change hard code based on ML
+        sentimentScore: 0 //TODO this too
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.response;
+  } catch (error) {
+    console.error('Failed to generate AI response:', error);
+    // Return fallback response
+    return "I'm here to listen and support you through this. Your feelings are valid, and it's okay to take things one step at a time.";
+  }
 };
 
 // Cooldown logic - only respond once per hour to avoid spam

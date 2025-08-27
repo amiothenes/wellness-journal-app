@@ -1,13 +1,15 @@
 import express from 'express';
 import cors from 'cors';
+import * as dotenv from 'dotenv';
 import { initDB } from './db';
 import journalRoutes from './routes/journalRoutes';
 import suggestionRoutes from './routes/suggestionRoutes';
 import moodRoutes from './routes/moodRoutes';
 import { finalizeOldEntries } from './controllers/journalController';
 
+dotenv.config();
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());

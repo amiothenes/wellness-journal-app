@@ -154,9 +154,11 @@ function App() {
       // Check if AI should respond
       const sentiment = analyzeSentiment(text, mood);
       // if (sentiment.threshold_met && shouldGenerateResponse(existingParagraphs)) {
-      if (true) {
+      if (true) { //TODO: change this once initial ML is implemented
         try {
-          const aiResponseText = generateAIResponse(sentiment, text);
+          // Generate AI response using the new async function
+          // const aiResponseText = await generateAIResponse(sentiment, text, mood);
+          const aiResponseText = await generateAIResponse(text, mood);
           const aiResponseData = {
             sentiment_score: sentiment.score,
             response_type: sentiment.suggested_response_type,
