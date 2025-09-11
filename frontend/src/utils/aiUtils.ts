@@ -3,34 +3,42 @@ import { ChatParagraph } from "../types/Entry";
 export interface SentimentAnalysis {
   score: number; // -1 to 1, where -1 is very negative
   threshold_met: boolean;
-  suggested_response_type: 'acknowledgment' | 'coping_strategy' | 'therapy_suggestion';
+  label?: string; // 'positive' or 'negative'
+  confidence?: number; // 0 to 1
 }
 
-// Fake sentiment analysis for now
-export const analyzeSentiment = (text: string, mood: number): SentimentAnalysis => {
-  // Simple threshold logic for testing
-  const lowMoodThreshold = mood <= 3;
-  const negativeKeywords = ['sad', 'depressed', 'hopeless', 'awful', 'terrible', 'hate', 'worthless'];
-  const hasNegativeKeywords = negativeKeywords.some(word => 
-    text.toLowerCase().includes(word)
-  );
-  
-  const score = lowMoodThreshold && hasNegativeKeywords ? -0.8 : 
-                lowMoodThreshold ? -0.5 : 
-                hasNegativeKeywords ? -0.6 : 0.2;
-  
-  return {
-    score,
-    threshold_met: score <= -0.5,
-    suggested_response_type: score <= -0.7 ? 'therapy_suggestion' : 
-                           score <= -0.5 ? 'coping_strategy' : 'acknowledgment'
-  };
+export const analyzeSentiment = async (text: string, mood?: number): Promise<SentimentAnalysis> => {
+  try {
+    const response = await fetch('http://localhost:3002/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, mood })
+    });
+    
+    if (!response.ok) throw new Error('Sentiment analysis failed');
+    
+    const data = await response.json();
+    return {
+      score: data.score,
+      threshold_met: data.threshold_met,
+      label: data.label,
+      confidence: data.confidence
+    };
+  } catch (error) {
+    console.error('ML sentiment analysis failed:', error);
+    // Fallback to simple logic based on mood if available
+    const fallbackScore = mood ? (mood - 5) / 5 : 0; // Convert 1-10 mood to -0.8 to 1.0 scale
+    return { 
+      score: fallbackScore, 
+      threshold_met: fallbackScore <= -0.5,
+      label: fallbackScore < 0 ? 'negative' : 'positive',
+      confidence: 0.5
+    };
+  }
 };
 
 export const generateAIResponse = async (
-  // analysis: SentimentAnalysis, 
-  userText: string,
-  mood: number
+  userText: string
 ): Promise<string> => {
   try {
     const response = await fetch('http://localhost:3001/api/journal/ai-response/generate', {
@@ -38,9 +46,6 @@ export const generateAIResponse = async (
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text: userText,
-        mood: mood,
-        emotionType: 'default', //TODO change hard code based on ML
-        sentimentScore: 0 //TODO this too
       })
     });
     
@@ -57,13 +62,29 @@ export const generateAIResponse = async (
   }
 };
 
-// Cooldown logic - only respond once per hour to avoid spam
-export const shouldGenerateResponse = (paragraphs: ChatParagraph[]): boolean => {
+// Enhanced function that includes ML sentiment analysis for threshold detection
+export const shouldGenerateResponse = async (
+  paragraphs: ChatParagraph[], 
+  text: string
+): Promise<boolean> => {
+  // First check cooldown logic - only respond once per hour to avoid spam
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   const recentAIResponses = paragraphs.filter(p => 
     p.paragraph_type === 'ai_response' && 
     new Date(p.timestamp) > oneHourAgo
   );
   
-  return recentAIResponses.length === 0;
+  if (recentAIResponses.length > 0) {
+    return false; // Still in cooldown period
+  }
+  
+  // Then check sentiment threshold using ML service
+  try {
+    const sentiment = await analyzeSentiment(text);
+    return sentiment.threshold_met;
+  } catch (error) {
+    console.error('Failed to analyze sentiment for response threshold:', error);
+    // Fallback: don't generate response if ML service fails
+    return false;
+  }
 };

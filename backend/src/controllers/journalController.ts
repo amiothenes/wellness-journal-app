@@ -191,7 +191,7 @@ export const finalizeOldEntries = async () => {
 
 export const generateAIResponseText = async (req: Request, res: Response) => {
   try {
-    const { text, mood, emotionType, sentimentScore } = req.body;
+    const { text } = req.body;
     
     // Validate input
     if (!text) {
@@ -200,12 +200,8 @@ export const generateAIResponseText = async (req: Request, res: Response) => {
       });
     }
     
-    // Default values if not provided
-    const moodValue = mood || 5;
-    const emotionTypeValue = emotionType || 'default';
-    const sentimentScoreValue = sentimentScore || 0;
     
-    const response = await generateTherapyResponse(text, moodValue, emotionTypeValue, sentimentScoreValue);
+    const response = await generateTherapyResponse(text);
     
     res.json({ response });
   } catch (error) {

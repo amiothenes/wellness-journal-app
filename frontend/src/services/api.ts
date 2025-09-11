@@ -1,4 +1,5 @@
 const API_BASE = 'http://localhost:3001/api';
+const ML_API_BASE = 'http://localhost:3002/api';
 
 export const journalAPI = {
   // Get all entries for sidebar
@@ -62,6 +63,37 @@ export const journalAPI = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ entryId, text, triggerParagraphId, aiResponseData })
     });
+    return response.json();
+  }
+};
+
+export const mlAPI = {
+  // Analyze sentiment using ML service
+  analyzeSentiment: async (text: string, mood?: number) => {
+    const response = await fetch(`${ML_API_BASE}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, mood })
+    });
+    if (!response.ok) throw new Error('Sentiment analysis failed');
+    return response.json();
+  },
+
+  // Check ML service health
+  healthCheck: async () => {
+    const response = await fetch(`${ML_API_BASE}/health`);
+    return response.json();
+  },
+
+  // Get ML model information
+  getModelInfo: async () => {
+    const response = await fetch(`${ML_API_BASE}/model-info`);
+    return response.json();
+  },
+
+  // Get ML service statistics
+  getStatistics: async () => {
+    const response = await fetch(`${ML_API_BASE}/statistics`);
     return response.json();
   }
 };
