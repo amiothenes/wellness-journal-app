@@ -7,23 +7,44 @@ const hf = new HfInference(process.env.HUGGINGFACE_API_KEY);
 
 export const generateTherapyResponse = async (
   userText: string,
+  contextParagraphs: string[] = []
 ): Promise<string> => {
   try {
-    const response = await hf.chatCompletion({
+
+    // Build structured context
+    const contextSection = contextParagraphs.length > 0 
+      ? `Previous journal entries:\n${contextParagraphs.join('\n')}\n\n`
+      : '';
+
+        const response = await hf.chatCompletion({
       provider: 'hf-inference',
       model: "HuggingFaceTB/SmolLM3-3B",
       messages: [
         {
           role: "system",
-          content: "You are a compassionate mental health assistant. Provide brief, supportive responses with practical coping strategies. Keep responses under 150 words, be empathetic, and focus on helpful advice. Do not include any thinking or reasoning - provide only the direct supportive response. Use plain text without any emojis, bold formatting or asterisks."
+          content: `You are a compassionate mental health assistant specializing in journal-based wellness support. 
+
+Guidelines:
+- Acknowledge the user's current emotional state based on their journal entry
+- Reference patterns or themes from their previous entries when relevant
+- Provide specific, actionable coping strategies tailored to their situation
+- Use a warm, non-judgmental tone
+- Keep responses under 150 words
+- Focus on resilience-building and self-compassion
+- Avoid generic advice; personalize based on their sharing
+
+Format: Provide only the direct supportive response without any meta-commentary or reasoning explanations.`
         },
         {
           role: "user",
-          content: `I'm feeling negative emotions. Here's what I shared: "${userText}". Can you provide some supportive advice and coping strategies?`
+          content: `${contextSection}\nCurrent journal entry: "${userText}"
+
+Please provide personalized support and guidance based on what I've shared.`
         }
       ],
-      max_tokens: 500,
-      temperature: 0.6
+      max_tokens: 400, // Reduced since we want <150 words
+      temperature: 0.7, // Slightly higher for more personalized responses
+      top_p: 0.9 // Add nucleus sampling for better quality
     });
     console.log(response.choices[0].message);
     // Extract the response content

@@ -152,14 +152,11 @@ function App() {
       let updatedParagraphs = [...existingParagraphs, newParagraph];
 
       // Check if AI should respond (using ML sentiment analysis as threshold)
-      const shouldRespond = await shouldGenerateResponse(
-        existingParagraphs,
-        text
-      );
+      const shouldRespond = await shouldGenerateResponse(text);
       if (shouldRespond) {
         try {
           // Generate AI response using the new async function
-          const aiResponseText = await generateAIResponse(text);
+          const aiResponseText = await generateAIResponse( text, existingParagraphs);
 
           // Get sentiment analysis for metadata (we already did this in shouldGenerateResponse, but it's fast)
           const sentiment = await analyzeSentiment(text, mood);

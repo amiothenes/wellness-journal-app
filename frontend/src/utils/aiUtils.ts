@@ -37,15 +37,49 @@ export const analyzeSentiment = async (text: string, mood?: number): Promise<Sen
   }
 };
 
+//1 tok is approx 4 char
+const estimateTokens = (text: string): number => {
+  return Math.ceil(text.length / 4);
+};
+
 export const generateAIResponse = async (
-  userText: string
+  userText: string,
+  previousParagraphs: ChatParagraph[] = []
 ): Promise<string> => {
   try {
+    //TODO: decide whether you want AI responses as more context (not filtered) OR "helpful ai response triggered"
+
+    const MAX_CONTEXT_TOKENS = 6000; // Leave room for system prompt + response approx to this model rn
+    
+    const currentTextTokens = estimateTokens(userText);
+    let remainingTokens = MAX_CONTEXT_TOKENS - currentTextTokens;
+
+    const userParagraphs = previousParagraphs
+      .filter(p => p.paragraph_type === 'user')
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    
+      // Build context with sliding window
+    const contextParagraphs: string[] = [];
+
+    for (const paragraph of userParagraphs) {
+      const paragraphText = `Previous entry: "${paragraph.text}"`;
+      const paragraphTokens = estimateTokens(paragraphText);
+      
+      // Check if we have room for this paragraph
+      if (remainingTokens >= paragraphTokens) {
+        contextParagraphs.unshift(paragraphText); // Add to beginning (chronological order)
+        remainingTokens -= paragraphTokens;
+      } else {
+        break; // No more room
+      }
+    }
+    
     const response = await fetch('http://localhost:3001/api/journal/ai-response/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text: userText,
+        contextParagraphs: contextParagraphs
       })
     });
     
@@ -64,19 +98,8 @@ export const generateAIResponse = async (
 
 // Enhanced function that includes ML sentiment analysis for threshold detection
 export const shouldGenerateResponse = async (
-  paragraphs: ChatParagraph[], 
   text: string
 ): Promise<boolean> => {
-  // First check cooldown logic - only respond once per hour to avoid spam
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-  const recentAIResponses = paragraphs.filter(p => 
-    p.paragraph_type === 'ai_response' && 
-    new Date(p.timestamp) > oneHourAgo
-  );
-  
-  if (recentAIResponses.length > 0) {
-    return false; // Still in cooldown period
-  }
   
   // Then check sentiment threshold using ML service
   try {
