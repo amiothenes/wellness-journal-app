@@ -54,15 +54,16 @@ export const generateAIResponse = async (
     const currentTextTokens = estimateTokens(userText);
     let remainingTokens = MAX_CONTEXT_TOKENS - currentTextTokens;
 
-    const userParagraphs = previousParagraphs
-      .filter(p => p.paragraph_type === 'user')
+    const paragraphs = previousParagraphs
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     
       // Build context with sliding window
     const contextParagraphs: string[] = [];
 
-    for (const paragraph of userParagraphs) {
-      const paragraphText = `Previous entry: "${paragraph.text}"`;
+    for (const paragraph of paragraphs) {
+      const paragraphText = paragraph.paragraph_type === 'ai_response' 
+      ? `Previous AI help assistance entry: "${paragraph.text}"`
+      : `Previous user entry: "${paragraph.text}"`;
       const paragraphTokens = estimateTokens(paragraphText);
       
       // Check if we have room for this paragraph
@@ -73,6 +74,8 @@ export const generateAIResponse = async (
         break; // No more room
       }
     }
+
+    console.log(contextParagraphs);
     
     const response = await fetch('http://localhost:3001/api/journal/ai-response/generate', {
       method: 'POST',
