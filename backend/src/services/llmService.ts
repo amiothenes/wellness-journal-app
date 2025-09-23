@@ -1,9 +1,9 @@
-import { HfInference } from '@huggingface/inference';
+import { InferenceClient } from '@huggingface/inference';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const hf = new HfInference(process.env.HUGGINGFACE_API_KEY);
+const hf = new InferenceClient(process.env.HUGGINGFACE_API_KEY);
 
 export const generateTherapyResponse = async (
   userText: string,

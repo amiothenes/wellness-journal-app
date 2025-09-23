@@ -47,8 +47,6 @@ export const generateAIResponse = async (
   previousParagraphs: ChatParagraph[] = []
 ): Promise<string> => {
   try {
-    //TODO: decide whether you want AI responses as more context (not filtered) OR "helpful ai response triggered"
-
     const MAX_CONTEXT_TOKENS = 6000; // Leave room for system prompt + response approx to this model rn
     
     const currentTextTokens = estimateTokens(userText);
@@ -74,8 +72,6 @@ export const generateAIResponse = async (
         break; // No more room
       }
     }
-
-    console.log(contextParagraphs);
     
     const response = await fetch('http://localhost:3001/api/journal/ai-response/generate', {
       method: 'POST',
