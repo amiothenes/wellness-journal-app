@@ -50,7 +50,7 @@ def preprocess_text(texts):
 
 # Inject the function into __main__ to match the saved model
 if '__main__' in sys.modules:
-    sys.modules['__main__'].preprocess_text = preprocess_text #TODO: avoid the injection hack by retraining the model without __main__.preprocess
+    sys.modules['__main__'].preprocess_text = preprocess_text
 
 class SentimentAnalyzer:
     def __init__(self, threshold=-0.5):

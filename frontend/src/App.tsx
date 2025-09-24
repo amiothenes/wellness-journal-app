@@ -24,6 +24,7 @@ function App() {
   const [moodCache, setMoodCache] = useState<{
     [entryId: number]: number | null;
   }>({});
+  const [isAIResponding, setIsAIResponding] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute(
@@ -151,57 +152,33 @@ function App() {
 
       let updatedParagraphs = [...existingParagraphs, newParagraph];
 
-      // Check if AI should respond (using ML sentiment analysis as threshold)
-      const shouldRespond = await shouldGenerateResponse(
-        existingParagraphs,
-        text
-      );
-      if (shouldRespond) {
-        try {
-          // Generate AI response using the new async function
-          const aiResponseText = await generateAIResponse(text);
-
-          // Get sentiment analysis for metadata (we already did this in shouldGenerateResponse, but it's fast)
-          const sentiment = await analyzeSentiment(text, mood);
-          const aiResponseData = {
-            sentiment_score: sentiment.score,
-            confidence: sentiment.confidence,
-          };
-
-          // Save AI response to backend
-          const aiResponse = await journalAPI.createAIResponse(
-            selectedEntry.entry_id,
-            aiResponseText,
-            newParagraph.paragraph_id,
-            aiResponseData
-          );
-
-          // Add AI response to local state
-          updatedParagraphs.push({
-            paragraph_id: aiResponse.paragraph_id,
-            timestamp: aiResponse.timestamp,
-            text: aiResponse.text,
-            mood: 5,
-            paragraph_type: "ai_response",
-            trigger_paragraph_id: newParagraph.paragraph_id,
-            ai_response_data: aiResponseData,
-          });
-        } catch (error) {
-          console.error("Failed to generate AI response:", error);
-        }
-      }
-
-      const updatedEntry = {
+      // Update state immediately with user's message
+      const entryWithUserMessage = {
         ...selectedEntry,
         paragraphs: updatedParagraphs,
       };
 
-      const updatedEntries = allEntries.map((entry) =>
-        entry.entry_id === selectedEntry.entry_id ? updatedEntry : entry
+      const updatedEntriesWithUser = allEntries.map((entry) =>
+        entry.entry_id === selectedEntry.entry_id ? entryWithUserMessage : entry
       );
 
-      setAllEntries(updatedEntries);
-      setSelectedEntry(updatedEntry);
+      setAllEntries(updatedEntriesWithUser);
+      setSelectedEntry(entryWithUserMessage);
+
+      // Check if AI should respond (using ML sentiment analysis as threshold)
+      const shouldRespond = await shouldGenerateResponse(text);
+      if (shouldRespond) {
+        // Set loading state for AI response
+        setIsAIResponding(true);
+
+        // Generate AI response asynchronously without blocking UI
+        generateAIResponseAsync(
+          text,
+          existingParagraphs,
+          newParagraph,
+          entryWithUserMessage
+        );
+      }
 
       // If this is today's entry and it's the first paragraph, mark today's entry as existing
       if (isToday(selectedEntry.timestamp) && existingParagraphs.length === 0) {
@@ -211,7 +188,9 @@ function App() {
       // After successful save, update mood cache if it's today's entry
       if (selectedEntry && isToday(selectedEntry.timestamp)) {
         const updatedMood = calculateLiveMood(
-          updatedEntry.paragraphs.filter((p) => p.paragraph_type === "user")
+          entryWithUserMessage.paragraphs.filter(
+            (p) => p.paragraph_type === "user"
+          )
         );
         setMoodCache((prev) => ({
           ...prev,
@@ -220,6 +199,62 @@ function App() {
       }
     } catch (error) {
       console.error("Failed to add paragraph:", error);
+    }
+  };
+
+  const generateAIResponseAsync = async (
+    text: string,
+    existingParagraphs: ChatParagraph[],
+    newParagraph: ChatParagraph,
+    currentEntry: JournalEntry
+  ) => {
+    try {
+      // Generate AI response
+      const aiResponseText = await generateAIResponse(text, existingParagraphs);
+
+      // Get sentiment analysis for metadata
+      const sentiment = await analyzeSentiment(text, newParagraph.mood);
+      const aiResponseData = {
+        sentiment_score: sentiment.score,
+        confidence: sentiment.confidence,
+      };
+
+      // Save AI response to backend
+      const aiResponse = await journalAPI.createAIResponse(
+        currentEntry.entry_id,
+        aiResponseText,
+        newParagraph.paragraph_id,
+        aiResponseData
+      );
+
+      // Add AI response to local state
+      const aiParagraph: ChatParagraph = {
+        paragraph_id: aiResponse.paragraph_id,
+        timestamp: aiResponse.timestamp,
+        text: aiResponse.text,
+        mood: 5,
+        paragraph_type: "ai_response",
+        trigger_paragraph_id: newParagraph.paragraph_id,
+        ai_response_data: aiResponseData,
+      };
+
+      const updatedParagraphs = [...currentEntry.paragraphs, aiParagraph];
+
+      const updatedEntry = {
+        ...currentEntry,
+        paragraphs: updatedParagraphs,
+      };
+
+      const updatedEntries = allEntries.map((entry) =>
+        entry.entry_id === currentEntry.entry_id ? updatedEntry : entry
+      );
+
+      setAllEntries(updatedEntries);
+      setSelectedEntry(updatedEntry);
+    } catch (error) {
+      console.error("Failed to generate AI response:", error);
+    } finally {
+      setIsAIResponding(false);
     }
   };
 
@@ -331,6 +366,7 @@ function App() {
                 selectedEntry={selectedEntry}
                 onSave={handleSave}
                 onDelete={handleParagraphDelete}
+                isAIResponding={isAIResponding}
               />
             </div>
           </div>

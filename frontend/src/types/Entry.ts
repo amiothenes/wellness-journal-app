@@ -23,6 +23,7 @@ export interface MainProps {
   selectedEntry: JournalEntry | null;
   onSave: (mood: number, text: string) => void;
   onDelete: (paragraph: ChatParagraph) => void ;
+  isAIResponding: boolean;
 }
 
 export interface SidebarProps {
