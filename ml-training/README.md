@@ -12,6 +12,7 @@ This directory contains the machine learning pipeline for training the binary se
 - **Dataset**: GoEmotions (Google Research)
 - **Task**: Binary sentiment classification (positive/negative)
 - **Architecture**: TF-IDF + Logistic Regression
+- **Model Performance**:
 ![Model Performance](https://i.imgur.com/DwPJpfN.png)
 - **Output**: `sentiment_model.joblib` (deployed in `../ml-service/models/`)
 
