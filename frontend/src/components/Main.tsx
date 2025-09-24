@@ -1,4 +1,10 @@
-import React, {ChangeEvent, FormEvent, useEffect, useState, useRef} from 'react';
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Main.css";
 import { ChatParagraph, JournalEntry, MainProps } from "../types/Entry";
@@ -11,7 +17,9 @@ function Main({ selectedEntry, onSave, onDelete, isAIResponding }: MainProps) {
   const navigate = useNavigate();
   const [currentMood, setCurrentMood] = useState<number>(5);
   const [currentEntry, setCurrentEntry] = useState<string>("");
-  const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(selectedEntry);
+  const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(
+    selectedEntry
+  );
   const [canSubmit, setCanSubmit] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -128,11 +136,20 @@ function Main({ selectedEntry, onSave, onDelete, isAIResponding }: MainProps) {
             <div className="mood-slider">
               <span className="mood-label">Select Mood:</span>
               <div className="slider-container">
-                <div className="slider-track"></div>
+                <div className="slider-track">
+                  <div
+                    className="slider-fill"
+                    style={{ width: `${((currentMood - 1) / 9) * 100}%` }}
+                  ></div>
+                </div>
                 <span className="slider-min-max">1</span>
                 <div className="slider-ticks">
                   {[...Array(10)].map((_, i) => (
-                    <div key={i} className="slider-tick"></div>
+                    <div
+                      key={i}
+                      className="slider-tick"
+                      style={{ left: `${(i / 9) * 100}%` }}
+                    ></div>
                   ))}
                 </div>
                 <input
