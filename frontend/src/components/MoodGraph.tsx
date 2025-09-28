@@ -159,17 +159,17 @@ function MoodGraph({
             justifyContent: "center",
           }}
         >
-          <button 
-            className="blue-button" 
+          <button
+            className="blue-button"
             onClick={handlePrev}
             style={{
-              borderRadius: '50%',
-              width: '44px',
-              height: '44px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0'
+              borderRadius: "50%",
+              width: "44px",
+              height: "44px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0",
             }}
           >
             <img
@@ -185,17 +185,17 @@ function MoodGraph({
               ? `Week of ${format(days[0], "MMM d, yyyy")}`
               : `${format(currentDate, "MMMM yyyy")}`}
           </span>
-          <button 
-            className="blue-button" 
+          <button
+            className="blue-button"
             onClick={handleNext}
             style={{
-              borderRadius: '50%',
-              width: '44px',
-              height: '44px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0'
+              borderRadius: "50%",
+              width: "44px",
+              height: "44px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0",
             }}
           >
             <img
@@ -330,16 +330,36 @@ function MoodGraph({
           className="mood-graph-chart"
           style={{ marginTop: "40px", height: "480px" }}
         >
-          <ResponsiveContainer width="100%" height={440}>
+          <h3 className="mood-chart-title">
+            {view === "week"
+              ? `Mood Trend - Week of ${format(days[0], "MMM d, yyyy")}`
+              : `Mood Trend - ${format(currentDate, "MMMM yyyy")}`}
+          </h3>
+          <ResponsiveContainer width="100%" height={400}>
             <LineChart
               data={graphData.filter((d) => d.mood !== null)} // Filter out null values for chart
-              margin={{ top: 40, right: 40, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 40, left: 20, bottom: 60 }}
               onClick={handleChartClick}
             >
               {/* X-Axis: shows day labels (weekday for week view, day number for month view) */}
-              <XAxis dataKey="label" />
+              <XAxis
+                dataKey="label"
+                label={{
+                  value: view === "week" ? "Day of Week" : "Day of Month",
+                  position: "insideBottom",
+                  offset: -10,
+                }}
+              />
               {/* Y-Axis: mood scale from 1 to 10 */}
-              <YAxis domain={[1, 10]} allowDecimals={false} />
+              <YAxis
+                domain={[1, 10]}
+                allowDecimals={false}
+                label={{
+                  value: "Mood Rating",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
+              />
               {/* Tooltip: shows mood value on hover */}
               <Tooltip />
               {/* Line: mood values for each day */}

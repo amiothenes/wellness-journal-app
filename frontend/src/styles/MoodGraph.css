@@ -285,6 +285,16 @@
   height: 480px;
 }
 
+.mood-chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
 /* .save-button {
   background: var(--accent-blue);
   color: white;

@@ -1,5 +1,6 @@
 backend/database.db
 docs
+.github
 
 # dependencies
 node_modules/
