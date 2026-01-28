@@ -2,6 +2,8 @@
 
 A full-stack wellness journaling application that combines personal journaling with AI-powered responses and sentiment analysis to support mental health and self-reflection.
 
+![GIF screenshot of the journal UI](https://i.imgur.com/1d7MhRO.gif)
+
 ## Features
 
 - **Daily Journaling**: Write entries with mood tracking (1-10 scale)
@@ -75,4 +77,8 @@ The app runs three services concurrently:
 - **Backend**: Express API with SQLite database
 - **ML Service**: FastAPI app for sentiment analysis
 
+
 All services start automatically with `npm run dev`.
+
+## Calendar Rating UI
+![Screenshot of the journal's week rating UI](https://i.imgur.com/g90c1fj.png)
