@@ -4,6 +4,9 @@ A full-stack wellness journaling application that combines personal journaling w
 
 ![GIF screenshot of the journal UI](https://i.imgur.com/1d7MhRO.gif)
 
+## Calendar Rating UI
+![Screenshot of the journal's week rating UI](https://i.imgur.com/g90c1fj.png)
+
 ## Features
 
 - **Daily Journaling**: Write entries with mood tracking (1-10 scale)
@@ -79,6 +82,3 @@ The app runs three services concurrently:
 
 
 All services start automatically with `npm run dev`.
-
-## Calendar Rating UI
-![Screenshot of the journal's week rating UI](https://i.imgur.com/g90c1fj.png)
